@@ -1,0 +1,3 @@
+<launch>
+  <node name="talker" pkg="traxxas_driver" type="talker" launch-prefix="sudo"/>
+</launch>
