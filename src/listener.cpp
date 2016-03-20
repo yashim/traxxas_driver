@@ -32,7 +32,7 @@ float targetSteeringOutput;
 
 
 void turn(float degrees, int side) {
-    pca9685->setPWM(STEERING_CHANNEL,0,PWM_STEERING_NEUTRAL + 50 * side);
+    pca9685->setPWM(STEERING_CHANNEL,0,PWM_STEERING_NEUTRAL + 100 * degrees);
 } 
 
 void throttle(float amount, int direction) {
@@ -41,8 +41,6 @@ void throttle(float amount, int direction) {
 
 void callback(const ackermann_msgs::AckermannDrive::ConstPtr& msg)
 {
-  ROS_INFO("I heard: [%f]", msg->steering_angle);
-
     if (msg->speed > 0) {
        throttle(1.0, 1);
     } else if (msg->speed < 0) {
@@ -52,9 +50,9 @@ void callback(const ackermann_msgs::AckermannDrive::ConstPtr& msg)
     } 
 
     if (msg->steering_angle > 0) {  
-       turn(1.0, 1);
+       turn(msg->steering_angle, 1);
     } else if (msg->steering_angle < 0) {
-       turn(1.0, -1);
+       turn(msg->steering_angle, -1);
     } else {
        turn(0.0, 0);
     }
@@ -147,7 +145,7 @@ int main(int argc, char **argv)
    * is the number of messages that will be buffered up before beginning to throw
    * away the oldest ones.
    */
-  ros::Subscriber sub = n.subscribe("chatter", 1000, callback);
+  ros::Subscriber sub = n.subscribe("drivecmd", 1000, callback);
 
   /**
    * ros::spin() will enter a loop, pumping callbacks.  With this version, all
